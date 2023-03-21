@@ -80,4 +80,22 @@ test <- array(seasons, dim=c(2,2,2))
 test[1,1,]
 test[1,1,2]
 test[,,2]
+class(test[,,2])
 
+
+##리스트
+list_score <- list(ko=90, ma=100, en=98)
+list_score
+list_score$ko
+
+#변경
+list_score$ko <- 100
+list_score
+
+#추가
+list_score$sci <- 8
+list_score
+
+#삭제
+list_score$sci <- NULL
+list_score
