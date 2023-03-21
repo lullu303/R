@@ -309,9 +309,139 @@ df_midterm
 df_midterm <- subset(df_midterm, select=-미술)
 df_midterm
 
+# 데이터프레임에서 데이터 조회(index)
+sales <- df_sales
+sales
+
+# 특정 열값만 추출(df$열이름)
+sales$NAME # 벡터 반환
+
+# 특정 요소값 추출 : df[행,열]
+sales[1,3]
+
+sales[1,] #1행 - data.frame 형태로 반환
+class(sales[1,])
+
+sales[,3] #3열 - numeric 벡터형 반환
+class(sales[,3])
+
+# 여러행 또는 여러열 추출
+sales[c(1,2),] # 1,2 행 추출 - df 반환
+sales[,c(1,2)] # 1,2 열 추출 - df 반환
+sales[,c(1:3)] # 1~3 열 추출 - df 반환
 
 
+# subset(df, 조건) 함수로 조건 추출
+sales
+
+subset(sales, QTY<5)
+subset(sales, price==200)
+
+# subset(sales, names==Apple)
+# Error in eval(e, x, parent.frame()) : object 'Apple' not found
+
+subset(sales, names== "Apple")
+
+# 데이터프레임 결합
+# rbind(), cbind(), merge() 사용
+
+# 예제 df 생성
+no <- c(1,2,3)
+name <- c('apple','banana','peach')
+price <- c(100,200,300)
+df1 <- data.frame(NO=no,NAME=name,PRICE=price)
+df1
+
+no <- c(10,20,30)
+name <- c('train','car','airplane')
+price <- c(1000,2000,3000)
+df2 <- data.frame(NO=no,NAME=name,PRICE=price)
+df2
+
+# cbind(df1, df2, dfn)
+# 열방향 단순결합
+cbind(df1,df2)
+
+# rbind(df1, df2, dfn) # 각 df의 열이름이 동일해야 한다.
+rbind(df1,df2)
+
+# merge(df1,df2)
+# 양쪽 df에서 공통열을 기준으로 병합
+df1 <- data.frame(name=c('apple','banana','cherry'),
+                  price=c(300,200,100))
+df2 <- data.frame(name=c('apple','cherry','berry'),
+                  qty=c(10,20,30))
+
+merge(df1,df2)
+# name 필드의 데이터값이 양쪽 df에 모두나타나는 경우만 병합 후 반환
+
+# 어느 한쪽 df에만 존재하는 data까지 모두 반환
+# all=T 파라미터 사용, 없는 data는 NA로 채운다
+merge(df1,df2, all=T)
+
+# df 순서에 따라 열의 순서가 변경
+merge(df1,df2)
+merge(df2,df1)
+
+#df1에 행추가 방법
+#추가할 행을 포함하는 df를 새로 생성(대상 df와 열이름이 동일해야 함)
+# rbind(df1, 새로 생성된 df)
+new <- data.frame(name='mango',price=400)
+df1 <- rbind(df1,new)
+df1
+
+df1 <- rbind(data.frame(name='berry',price=500))
+df1
+
+#cbind()활용 열 추가
+df1 <- cbind(df1, data.frame(qt=c(10,20,30,40,50)))
+df1
+
+# 데이터프레임의 행/열 개수(길이)확인
+NROW(df1)
+NCOL(df1)
+###########################################
+# df 실습
+##############
+
+no <- c(1,2,3,4,5)
+name <- c("서진수","주시현","최경우","이동근","윤정웅")
+address <- c("서울","대전","포항","경주","경기")
+tel <- c(1111,2222,3333,4444,5555)
+hobby <- c("독서","미술","놀고먹기","먹고놀기","노는애감시하기")
 
 
+member <- data.frame(No=no, NAME=name, 
+                     ADDRESS=address, TEL=tel, HOBBY=hobby)
 
+#View() 함수 이용 출력
+View(member)
+
+# member열의 일부 열만 이용해서 새로운 df생성
+member2 <- subset(member, select=c(No,NAME,TEL))
+member2
+
+# 특정 컬럼만 제외하고 새로운 df생성
+member3 <- subset(member, select=TEL)
+member3
+
+# 열이름 변경
+colnames(member3) <- c("번호", "이름", "주소", "취미")
+member3
+
+# 행/열 길이확인 함수
+NCOL(member)
+ncol(member)
+NROW(member)
+nrow(member)
+
+
+#
+names(member)
+colnames(member)
+rownames(member)
+
+### 출력 순서 변경
+member[c(1,3,5,2,4),]
+member[,c(5,4,3,2,1)]
 
