@@ -243,6 +243,240 @@ exam %>%
 
 # summarise() 함수 : 통계치 산출(집단함수를 사용하게 해주는 함수)
 # 통계관련 함수를 사용할 수 있음 
+# 데이터 요약시 사용
+
+# exam 데이터셋의 수학점수 평균을 구하시오
+mean(exam$math)
+exam %>% summarise(mean_math=mean(math),
+                   mean_eng=mean(english),
+                   mean_sci=mean(science))
+
+# 그룹별로 데이터 분리 후 요약
+# group_by(데이터셋, 기준열) : 기준별로 데이터를 분리
+group_by(exam,class)
+# 각 반별 수학점수의 평균 
+exam %>% group_by(class) %>%
+  summarise(mean_math=mean(math),
+            mean_eng=mean(english),
+            mean_sci=mean(science))
+  
+# 반별 학생 수 
+# 그룹의 크기를 반환하는 함수 : n() -> 그룹별 행 수 반환
+exam %>% 
+  group_by(class) %>% 
+  summarise(student_cnt = n() )
+
+exam %>%  summarise(n=n()) #데이터셋의 전체 행 수 변환
+
+####################################################
+# 데이터 합치기
+
+# 세로 결합 : bind_rows()함수 사용
+# 결합하는 데이터셋의 공통 키가 있어야 되는 건 아님 
+
+# 학생 1 ~ 5 번의 시험 데이터
+group_a <- data.frame(id=c(1,2,3,4,5),
+                      test=c(60,80,70,90,85))
+
+# 학생 6~10 번의 시험 데이터
+group_b <- data.frame(id=c(6,7,8,9,10),
+                      test=c(80,83,65,95,83))
+
+# 같은 의미를 갖는 두 집단의 데이터를 한번에 분석하기 위해 결합 
+# 단순 세로 결합 
+group_all <- bind_rows(group_a,group_b)
+group_all
+
+rbind(group_a, group_b)
+
+# 학생 1 ~ 5 번의 시험1 데이터
+group_a <- data.frame(id=c(1,2,3,4,5),
+                      test1=c(60,80,70,90,85))
+
+# 학생 6~10 번의 시험2 데이터
+group_b <- data.frame(id=c(6,7,8,9,10),
+                      test2=c(80,83,65,95,83))
+
+bind_rows(group_a, group_b)
+
+# 가로결합 : left_join() / inner_join() / full_join()
+info_a <- data.frame(id=c(1,2,3),
+                     address=c("서울", "부산", "제주"))
+
+info_b <- data.frame(id=c(1,2,4),
+                     sex=c("남", "여", "남"))
+
+# inner_join() : 기준열의 공통된 값에 해당되는 데이터를 결합 후 반환
+inner_join(info_a,info_b,by="id")
+
+# left_join() : 조인 수식에서 먼저 나오는 데이터셋 기준열의 모든 정보르 반환
+# 뒤에 나오는 데이터 셋은 기준열의 공통된 값의 정보만 반환 
+# 어떤 데이터셋이 먼저 기술되느냐에 따라 결과가 달라짐
+left_join(info_a, info_b, by="id")
+left_join(info_b, info_a, by="id")
+
+# right_join() 조인 수식에서 먼저 나오는 데이터셋 기준열의 모든 정보르 반환
+right_join(info_a, info_b, by="id")
+right_join(info_b, info_a, by="id")
+
+# full_join() : 모든 id에 해당되는 값을 출력
+full_join(info_a, info_b, by="id")
+
+###########################################
+# 데이터 정제
+# 잘못된 데이터를 찾아서 수정
+# 이상치 : 정상 범주에서 크게 벗어난 값
+# - 현장에서 만들어진 실제 데이터에는 이상치가 포함될 수 있음
+# - 성별 변수 : 1(남), 2(여), 999(수집불가) 규정된 상황에서 
+# 3 데이터가 나타나면 일반적으로 발생하는 값의 범위를 벗어나는 극단적인 값
+# 어떤 제품의 하루 생산량 : -5000 값이면 이상치
+
+# 이상치가 포함되어지면 분석결과가 왜곡되므로 이상치는 찾아서 제거 
+# 결측치 : 데이터가 없는 것
+# 수집시 오류로 데이터가 수집되지 않은 상태
+# NA로 표시
+# 결측치가 있는 데이터를 연산하면 결과는 NA로 나타남
+# 결측치 제외 후 연산 진행 해야 함
+# 결측치의 양에 따라 제외하고 연산을 할 수 있음
+# 많은 함수에는 결측치 값을 제외하는 na.rm=T 파라미터를 갖고 있음 
+
+# NA 값 확인
+# is.na(변수)
+# 변수가 na값을 포함하고 있는지 확인 후 포함하면 TRUE 반환 
+
+# df 각 열에 결측치가 얼마나 되는지 확인 
+# table(data) : 데이터 빈도를 데이터 세트 형태로 출력
+# table(is.na(변수))
+# 결측치 건수 출력 
+
+# 데이터 정제
+# 결측치 포함시켜서 데이터 프레임 생성
+
+df <- data.frame(team=c("A", "B", NA, "A", "B"),
+                 score=c(5,3,4,4,NA))
+
+# 결측치 확인
+# df의 모든 값을 순회하면서 na인지 검사
+is.na(df)
+
+# team score
+# [1,] FALSE FALSE
+# [2,] FALSE FALSE
+# [3,]  TRUE FALSE
+# [4,] FALSE FALSE
+# [5,] FALSE  TRUE
+
+# 결측치 빈도 출력
+table(is.na(df))
+
+# team 컬럼의 결측치 빈도
+table(is.na(df$team))
+
+# 결측치 포함 시 연산 불가(결과: NA)
+mean(df$score)
+sum(df$score)
+
+# 결측치 제거
+# 결측치 있는 행만 추출
+# score가 NA인 행을 추출
+df %>%  filter(is.na(score))
+
+# score가 NA가 아닌 행을 추출
+df %>%  filter(!is.na(score))
+
+# score 컬럼의 결측치 행을 제거한 데이터
+df_nomiss <- df %>%  filter(!is.na(score))
+df_nomiss
+
+# 결측치 제거 후 산술연산 
+mean(df_nomiss$score)
+sum(df_nomiss$score)
+
+# 여러 컬럼에 결측치 없는 데이터 추출
+df_nomiss2 <- df %>%  filter(!is.na(score) & !is.na(team))
+df_nomiss2
+
+# na.omit(df) : df 모든 컬럼에서 na가 있는 행은 제거 후 결과를 반환
+# 결측치 없는 데이터로 추출
+df_nomiss3 <- na.omit(df)
+df_nomiss3
+
+# 모든 컬럼에 결측치가 있는 행을 제거하면 데이터에 따라서 
+# 많은 관측치가 제거될 수 있다. 
+
+# 결측치가 있는 행을 모두 제거하기 보다 연산시 결측은 제거하고 연산
+mean(df$score)
+mean(df$score, na.rm=T)
+
+# 모든 함수가 na.rm을 지원하는 것은 아님
+
+# summarise() 함수 : 요약 통계량 산출 시 na.rm 적용 가능
+
+exam
+
+# 결측치 제외 연습을 위해서 NA 삽입 
+# 3,8,15 행의 수학점수에 NA 할당
+exam[c(3,8,15),"math"] <- NA
+exam
+
+exam %>% 
+  summarise(mean_math = mean(math,na.rm = T))
+
+# 이상치 정제하기 
+
+# 이상치 제거 방법 
+# 1. 발견한 이상치 값을 NA(결측치)로 변경 
+# 2. 결측치 제거 
+
+# 예제 df 생성
+outlier <- data.frame(sex=c(1,2,1,3,2,1),
+                      score = c(5,4,3,4,2,6))
+
+# 성별은 남,여 : 1,2만 존재하는 것으로 간주하고
+# 3은 이상치 
+# scores는 1점부터 5점까지만 부여한다로 간주하면 6은 이상치 
+
+# 1. 이상치값을 NA로 변경
+outlier$sex <- ifelse(outlier$sex == 3, NA, outlier$sex)
+outlier$score <- ifelse(outlier$score > 5, NA, outlier$score)
+outlier
+
+# 2. 결측치 제거
+outlier_nomiss <- outlier %>% filter(!is.na(score) & !is.na(sex))
+outlier_nomiss
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
