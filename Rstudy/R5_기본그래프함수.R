@@ -324,6 +324,81 @@ hist(tmpl, breaks=seq(10,40,by=5))
 # pie()
 ##############################################
 
+# 기본 pie 차트
+pl <- c(10,20,32,38)
+pie(pl, radius = 1)
+
+pie(pl, radius = 1, init.angle = 90)
+
+# 색상과 label명 설정
+pie(pl, radius = 1, init.angle = 90,
+    col=rainbow(length(pl)),
+    label=c("1주", "2주", "3주", "4주"))
+
+pie(pl, radius = 0.5, init.angle = 90,
+    col=rainbow(length(pl)),
+    label=c("1주", "2주", "3주", "4주"))
+
+
+# 데이터값 출력하기
+# 소수점 1자리수로 퍼센트 출력
+pl/sum(pl)
+pct <- round(pl/sum(pl)* 100,1)
+lab <- paste(pct, "%")
+
+pie(pl, radius = 1, init.angle = 90,
+    col=rainbow(length(pl)),
+    label=lab)
+
+# legend() : 범례
+legend('topright',
+       c("1주", "2주", "3주", "4주"),
+       cex=0.5,
+       fill=rainbow(length(pl)))
+
+pct <- round(pl/sum(pl)* 100,1)
+lab <- paste(pct, "%")
+lab1 <- c("1주", "2주", "3주", "4주")
+lab2 <- paste(lab1, "\n", lab)
+
+pie(pl, radius = 1, init.angle = 90,
+    col=rainbow(length(pl)),
+    label=lab2,
+    cex=0.8) #label 크기 조정
+
+############################################
+# boxplot()
+# 기술통계량(중앙값, 제1사분위, 제3사분위 등)을
+# 상자모양으로 요약해서 나타낸 그래프
+
+v1 <- c(10,12,15,11,20)
+v2 <- c(5,7,15,8,9)
+v3 <- c(11,20,15,18,13)
+
+boxplot(v1,v2,v3,
+        col=c("blue","yellow", "pink"),
+        names=c("v1", "v2", "v3"))
+
+boxplot(v1,v2,v3,
+        col=c("blue","yellow", "pink"),
+        names=c("v1", "v2", "v3"),
+        horizontal = T)
+
+boxplot(v1,v2,v3,
+        col=c("blue","yellow", "pink"),
+        names=c("v1", "v2", "v3"),
+        horizontal = T,
+        notch = T)
+
+setwd("../")
+getwd()
+
+
+
+
+
+
+
 
 
 
