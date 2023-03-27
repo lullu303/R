@@ -140,17 +140,61 @@ a <- c(1,3)
 sweep(mat1,2, a) # 빼기연산(디폴트), mat1의 각 행에 대해서  a벡터 값을 뺀 결과
 sweep(mat1,2, a, "+") # 더하기 연산
 
+# length() : 요소의 개수나 행 수 파악
+Fruits # 데이터프레임
+Fruit # 열이름(attach(Fruits) 실행했음)
 
+length(Fruits) # df의 열의 수(변수의 개수)
+length(fruit) # 벡터의 요소 수
 
+# sort(벡터, [decreasing=]) 함수 : 데이터 정렬 함수
+# 벡터 등 1차원데이터의 정렬에 주로 사용
+sort(Sales) # 오름차순 정렬
+sort(Sales, decreasing = T) #내림차순 정렬
 
+###############################################################################
+# 문자열 처리
+# 문자열은 데이터의 많은 부분을 차지함
+# stringr 패키지 : 문자열(캐릭터형)을 가능한 쉽게 처리하도록 설계된 함수 제공
 
-#################################################################################
-
-install.packages("stringr")
+# install.packages("stringr")
 
 library(stringr)
 
-#####
+#################################################################################
+
+fruits <- c('apple', 'Apple', 'banana', 'pineapple', 'kp', 'p1')
+fruits
+
+# str_detect(data, 특정문자)
+# data 의 각 요소에 특정문자가 포함되어 이는지의 여부 T/F로 반환
+
+# 각 문자열에 대문자 A포함여부 출력
+str_detect(fruits,'A') # [1] FALSE  TRUE FALSE FALSE FALSE FALSE
+fruits[str_detect(fruits,'A')] # 논리값 인덱싱 
+
+# ^ / [] 이용한 정규식 표현
+# * : 첫 문자의 의미
+
+# 소문자 a로 시작하는지의 여부 출력
+str_detect(fruits,'^a') # [1]  TRUE FALSE FALSE FALSE FALSE FALSE
+
+# 소문자 p로 시작하는지의 여부 출력
+str_detect(fruits, '^[p]') # [1] FALSE FALSE FALSE  TRUE FALSE  TRUE
+
+# [a,b,c,d,e] : a 거나 b거나 c거나 ..
+# ^[a,b] : a 또는 b로 시작하는
+str_detect(fruits, '^[a,p]')
+
+# $ : 마지막 문자의 의미
+# 문자열의 마지막 문자가 소문자 e인지 여부 출력
+str_detect(fruits, 'e$')
+
+fruits[str_detect(fruits, 'e$')] # [1] "apple"     "Apple"     "pineapple"
+
+# [pk] : 문자열에 p또는 k가 포함되어있는지의 여부
+str_detect(fruits, '[pk]') # [1]  TRUE  TRUE FALSE  TRUE  TRUE  TRUE
+
 # . : 문자 1개를 의미
 stri <- c("ABB", "aaB", 'aa.b', "aAb")
 str_detect(stri, "a.b")
@@ -277,9 +321,72 @@ gsub("010-[0-9]{4}-[0-9]{4}",
      "010-****-****",
      "내 폰번호는 010-1234-1234")
 
+data <- "010으로 시작하고 0부터 9까지의 문자중 하나가 반복"
+gsub('\\d', '*', data) # '\\d' 숫자 전체
 
+test_data <- readLines('data/test1.txt')
+test_data
 
+res <- str_split(test_data, ' ') # list로 변환
+res <- unlist(res)
+res
 
+gsub('\\W', '*',res) # '\\w' _ 제외한 특수문자
 
+#####################################
+# sqldf 패키지
+# sql 문법을 df에 적용시키는 함수
 
+install.packages("sqldf")
+library(sqldf)
+
+# select 문 활용 : 행반환
+# * : 모든 열
+# select 열이름1, 열이름2, ... , 열이름 n from df명(테이블명) [where조건문]
+# sqldf('쿼리구문')
+Fruits
+# sql 쿼리문은 대소문자 구분하지 않는다.
+sqldf('select * from Fruits')
+sqldf('select * from fruits')
+
+# Apple 데이터만 출력
+# SQL 쿼리의 문법 중 문자열 표시는 '' 사용
+sqldf("select * from Fruits where Fruit = 'APPLES'")
+sqldf("select Year,Sales,Profit from Fruits where Fruit = 'APPLES'")
+sqldf("select Year,Sales,Profit from Fruits where Fruit = 'APPLES' AND Sales >= 100")
+
+# 출력되는 행 수 제어 : limit 사용
+sqldf('select * from Fruits limit5')
+
+# 정렬해서 출력 : order by 컬럼명 [desc]
+sqldf("select Year,Sales,Profit from Fruits order by Year")
+sqldf("select Year,Sales,Profit from Fruits order by Year desc")
+
+# select 문장에 그룹(집계) 함수 적용
+# sum()/avg()/max()/min()
+
+sqldf('select sum(Sales), avg(Sales), max(Sales), min(Sales) from Fruits')
+
+# 전체 행(data, 레코드) 수 파악
+sqldf('select count(*) from Fruits')
+
+# group by 기준열
+sqldf("select Fruit, sum(Sales) from Fruits group by Fruit")
+
+# sql 쿼리구문의 group by 적용시 주의점
+# select 되는 열은 group by의 기준열과 집계함수를 적용시킨 열만 표현해야 함
+sqldf("select Fruit, sum(Sales), Profit from Fruits group by Fruit")
+
+#########################################################################
+library(ggplot2)
+# mpg df 의 최대 고속도로 연비(hwy)를 갖는 자동차의 정보를 조회하시오
+sqldf('select max(hwy) from mpg') # => 44
+
+# sub 쿼리 사용
+sqldf('select * from mpg where hwy=44')
+
+# sub 쿼리
+# select * from mpg where hwy=(select max(hwy) from mpg)
+
+sqldf('select * from mpg where hwy=(select max(hwy) from mpg)')
 
