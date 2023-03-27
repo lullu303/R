@@ -144,7 +144,7 @@ sweep(mat1,2, a, "+") # 더하기 연산
 
 
 
-
+#################################################################################
 
 install.packages("stringr")
 
@@ -214,7 +214,56 @@ str_apple = "apple"
 
 # str_replace(전체문자열, 대상, 교체될 문자)
 str_replace(str_apple, 'p', '*')
+# [1] "a*ple" : 문자열 내에서 첫번째 만난 p를 *로 변환
 
+# 포함된 모든 문자 변경
+str_replace_all(str_apple, 'p', '*')
+str_replace_all(fruit, 'p', '*')
+
+
+fruits2 <- str_c("apple", "/", "orange", "/", "banana")
+fruits2
+
+# str_split() 특정 문자를 기준으로 문자열을 분리
+str_split(fruits2, "/") # 리스트로 반환
+
+# str_sub(데이터, start=시작인덱스, end=끝인덱스) : 부분문자열 추출
+str_sub("apple", start=1, end=3)
+
+str_sub(fruit, start=1, end=3)
+
+# start만 사용 가능, end 생략이므로 start부터 끝까지의 의미
+str_sub("apple", start = 2)
+
+# - : 뒤에서부터 시작
+str_sub("apple", start = -2)
+
+# str_trim(문자열, [side=right/left]) # 문자열의 앞/뒤 공백을 제거
+str_trim("apple banana berry") # 문자 사이의 공백을 제거할 수는 없다
+str_trim("   apple banana berry    ") # 앞뒤 공백 모두 제거
+
+
+str_trim("   apple banana berry    ", side='right') # 뒤 공백 제거
+str_trim("   apple banana berry    ", side='left') # 앞 공백 제거
+
+##########################################################################
+# 문자열 처리 함수 : R 내장함수
+# gsub(변경 전 문자(패턴 사용 가능), 변경 후 문자, 데이터, 옵션) 함수
+# : 문자를 정제하는 함수, 불필요한 문자를 제거할 때 사용
+# : 태그, 특수문자 등을 제거할 때 사용
+
+gsub("ABC", "***", "ABCabcABCBC")
+
+gsub("ABC", "***", "ABCabcABCBC", ignore.case = T)
+# ignore.case = T : 대소문자를 무시하고 패턴문자를 찾아 변경
+# "ABCabcABCBC" - 문자열을 대문자 또는 소문자로 변경후 패턴 매칭
+# ABC
+
+gsub("b.n", "***", "i love banana")
+
+gsub("[^ple]","*", "pineapple apple people")
+# p/l/e 로 시작하는 ^[ple] : [] 밖에 있는 ^
+# p/l/e 를 제외한 나머지 [^ple] : [] 안에 있는 ^는 제외의 의미 
 
 
 
