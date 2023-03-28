@@ -154,12 +154,69 @@ ggplot(sleep,
   geom_bar(stat='identity', position='dodge') +
   coord_flip()
 
+##############################
+# 선그래프 - 시계열 그래프 
+# : 시간에 따라 데이터의 변화를 표현
 
+# 시계열 데이터 economics (내장데이터)
+View(economics)
+str(economics)
+# 일자에 따른 실업자수의 변화
+ggplot(data=economics, aes(x=date,y=unemploy)) +
+  geom_line()
 
+ggplot(data=mpg, aes(x=displ, y=hwy)) + geom_line()
 
+######################################################
+# boxplot
+# 데이터의 분포를 확인하기 위한 그래프
+# 평균을 비교하는 막대그래프보다 
+# 자세히 이해할 수 있다
+# geom_boxplot()
 
+ggplot(data=df_mpg, aes(x=drv, y=mean_hwy)) +
+  geom_col() # 평균차이 비교
 
+ggplot(data=mpg, aes(x=drv, y=hwy)) + geom_boxplot()
 
+#######################################################
+### 그래프의 모양(선/색상/크기)
+# color/colour = "색상"
+# shape = 모양
+# size = 크기
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(color='red',
+             shape=5,
+             size=2)
+
+library(dplyr)
+# fill : 도형에 색을 채워줄 때 (막대그래프)
+Orange %>% 
+  group_by(Tree) %>% 
+  summarize(Sum.circumference=sum(circumference)) %>% 
+  ggplot(aes(Tree,Sum.circumference)) +
+  geom_bar(stat='identity', fill='red')
+  
+Orange %>% 
+  group_by(Tree) %>% 
+  summarize(Sum.circumference=sum(circumference)) %>% 
+  ggplot(aes(Tree,Sum.circumference, fill=Tree)) +
+  geom_bar(stat='identity')
+
+Orange %>% 
+  group_by(Tree) %>% 
+  summarize(Sum.circumference=sum(circumference)) %>% 
+  ggplot(aes(Tree,Sum.circumference, fill='red')) +
+  geom_bar(stat='identity')
+
+# fill 파라미터의 값으로 변수를 전달할 때는 aes()
+# 안에 있어야 함
+# Orange %>%
+#   group_by(Tree) %>%
+#   summarize(Sum.circumference=sum(circumference)) %>%
+#   ggplot(aes(Tree,Sum.circumference)) +
+#   geom_bar(stat='identity', fill=Tree)
+# object 'Tree' not found
 
 
 
