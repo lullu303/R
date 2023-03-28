@@ -83,7 +83,6 @@ table(mpg$drv)
 ggplot(data=mpg, aes(x=hwy)) + geom_bar()
 # hwy 데이터의 빈도를 세서 막대 그래프 생성
 table(mpg$hwy)
-
 # 연속형 데이터 각각의 빈도는 별다른 의미가 없다
 # 구간의 빈도를 주로 사용- 히스토그램
 
@@ -111,8 +110,10 @@ ggplot(data=diamonds, aes(cut)) + geom_bar(stat='count')
 
 
 # sleep 데이터세트
-View(sleep)
-ggplot(data=sleep, aes(x=ID, y=extra)) + 
+View(sleep) 
+# fill=group : sleep df의 컬럼 group의 데이터를 기준으로
+# 값을 분리해서 다른 색상을 표현
+ggplot(data=sleep, aes(x=ID, y=extra, fill=group)) + 
   geom_bar(stat='identity')
 
 
@@ -121,13 +122,45 @@ ggplot(data=sleep, aes(x=ID, y=extra)) +
 # position을 사용하기 위해서는 aes(fill=group) : 각 막대의 색상 표현
 View(sleep)
 ggplot(data=sleep, aes(x=ID, y=extra, fill=group)) + 
-  geom_bar(stat='identity', position='dodge')
+  geom_bar(stat='identity', position='dodge') # 묶음막대 그래프
 
 ggplot(data=sleep, aes(x=ID, y=extra, fill=group)) + 
-  geom_bar(stat='identity', position='fill')
+  geom_bar(stat='identity', position='fill') # 백분율 누적막대
 
 ggplot(data=diamonds, aes(x=color, fill=cut)) + 
   geom_bar(stat='count', position='fill')
+
+################################################################
+# 가로막대 그래프
+
+# 세로막대그래프를 그린 후 x축과 y축의 구성을 뒤집어 표현
+# coord_flip()
+
+# [1] 가로 누적 막대 그래프
+ggplot(sleep, 
+       aes(ID, extra, fill=group)) +
+  geom_bar(stat='identity') +
+  coord_flip()
+
+# [2] 가로 비율 막대 그래프
+ggplot(sleep, 
+       aes(ID, extra, fill=group)) +
+  geom_bar(stat='identity', position='fill') +
+  coord_flip()
+
+# [3] 가로 묶음 막대 그래프
+ggplot(sleep, 
+       aes(ID, extra, fill=group)) +
+  geom_bar(stat='identity', position='dodge') +
+  coord_flip()
+
+
+
+
+
+
+
+
 
 
 
