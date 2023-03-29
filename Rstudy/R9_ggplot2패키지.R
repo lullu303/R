@@ -10,6 +10,7 @@
 # 패키지 설치 및 로드
 # install.packages("ggplot2")
 library(ggplot2)
+library(scales)
 
 # 1단계 : 그래프 기본 틀 생성
 # ggplot(데이터세트, aes(속성)) 함수 사용 - 그래프이 좌표 생성 위해 틀을 만드는 함수
@@ -218,6 +219,267 @@ Orange %>%
 #   geom_bar(stat='identity', fill=Tree)
 # object 'Tree' not found
 
+# geom_line() 선그래프 : color 옵션으로 선 색상 설정
+Orange %>% 
+  filter(Tree == 1) %>% 
+  ggplot(aes(age, circumference)) +
+  geom_line(color='red')
 
+Orange %>% 
+  filter(Tree == 1) %>% 
+  ggplot(aes(age, circumference)) +
+  geom_line(color='red') +
+  geom_point(size=2)
+
+Orange %>% 
+  ggplot(aes(age,circumference, color=Tree)) +
+  geom_line()
+
+# 
+str(Orange) # Ord.factor
+
+# x축 data가 factor이면 geom_line() 안그려짐
+# Orange %>% 
+#   group_by(Tree) %>% 
+#   summarise(sum.circuference=sum(circumference)) %>% 
+#   ggplot(aes(Tree, sum.circuference)) +
+#   geom_line(color='red') 
+# `geom_line()`: Each group consists of only one observation.
+# ℹ Do you need to adjust the group aesthetic?
+
+str(Orange %>% 
+      group_by(Tree) %>% 
+      summarise(sum.circuference=sum(circumference)))
+
+# group에 대해 명시: group=1로 하나의 그룹으로 처리
+Orange %>% 
+  group_by(Tree) %>% 
+  summarise(sum.circuference=sum(circumference)) %>% 
+  ggplot(aes(Tree, sum.circuference)) +
+  # geom_col() +
+  geom_line(group=1, color='red') 
+
+# point 그래프 : 점 표시
+Orange %>% 
+  group_by(Tree) %>% 
+  summarise(sum.circuference=sum(circumference)) %>% 
+  ggplot(aes(Tree, sum.circuference)) +
+  geom_point(size=5, color='red')
+
+
+ggplot(Orange, aes(x=age, y=circumference, color=Tree)) +
+  geom_point()
+
+ggplot(Orange, aes(x=age, y=circumference, fill=Tree)) +
+  geom_bar(stat='identity', position='dodge')
+
+##############################################
+# 좌표계 : 직교 좌표계(카테시안 좌표계/데카르트 좌표계)
+
+# coord_cartesian() 함수 :
+# xlim, ylim, expand(축과 그래프의 여백 유부) 파라미터를 주로 사용
+
+faithful
+# 옐로스톤 국립공원의 간헐천의 분화와 분화사이의 대기시간 기록
+
+ggplot(faithful, aes(waiting, eruptions)) +
+  geom_point() +
+  coord_cartesian(xlim = c(min(faithful$waiting)-5,
+                           max(faithful$waiting)+5))
+
+ggplot(faithful, aes(waiting, eruptions)) +
+  geom_point() +
+  xlim(50,90)
+
+
+ggplot(faithful, aes(waiting, eruptions)) +
+  geom_point() +
+  coord_cartesian(expand=FALSE)
+# expand= 그래프와 축간의 상하좌우 여백의 유무 결정
+
+
+
+############################
+# scale 패키지 관련 함수
+ggplot(Orange, aes(x=age, y=circumference, fill=Tree)) +
+  geom_bar(stat='identity', position='dodge')
+# 위 그래프는 Tree 종류에 따라 다른 색상으로 막대그래프가 그려짐
+# 채워지는 색상은 내부 설정 색상을 사용
+
+# scale 패키지의 scale_xxx_manual() 함수를 사용하면 
+# 채워지는 색상 변경 가능
+# 기존의 색상 위에 다른 색상을 입혀주는 함수
+# 주의점 : scale_xxx_manual()   적용 전에 fill, color 파라미터를 먼저 설정해야 함.
+# scale_color_manual()- line 그래프 
+# / scale_fill_manual() - bar 그래프 
+library(scales)
+p <- Orange %>% 
+  group_by(Tree) %>% 
+  summarize(sum.circum = sum(circumference)) %>% 
+  ggplot(aes(Tree, sum.circum, fill=Tree)) +
+  geom_bar(stat = 'identity')
+p
+
+# scales 패키지의 scale_fill_manual() 함수를 통해
+# 각 막대그래프의 색상을 지정
+p + scale_fill_manual(values = c("#ffffff",
+                                 "#ffcc00",
+                                 "#ff9900",
+                                 "#ff6600",
+                                 "#ff3300"))
+
+# scale_fill_brewer(palette=)
+p + scale_fill_brewer(palette = 'Greens')
+p + scale_fill_brewer(palette = 'Reds')
+p + scale_fill_brewer(palette = 'Blues')
+p + scale_fill_brewer(palette = 'Spectral')
+
+# , direction = -1
+p + scale_fill_brewer(palette = 'Greens' , direction = -1 )
+p + scale_fill_brewer(palette = 'Reds' , direction = -1)
+p + scale_fill_brewer(palette = 'Blues' , direction = -1)
+p + scale_fill_brewer(palette = 'Spectral' , direction = -1)
+
+##########################################
+# 그래프를 그릴 때 범주형 변수의 처리
+
+View(mtcars)
+
+str(mtcars)
+
+
+# 데이터에서 cyl 별 자동차의 대수를 그래프로 비교확인하시오
+table(mtcars$cyl)
+ggplot(mtcars, aes(x=cyl)) +geom_bar()
+
+ggplot(mtcars, aes(x=cyl)) + geom_bar(width = 0.5)
+
+# cyl 데이터가 연속형 데이터로 되어 있음
+
+# 의미적으로 범주형 데이터임에도 형식이 연속형으로
+#되어 있으면, x축값을 매핑할 때 factor 형으로 바꿔서 매핑
+
+ggplot(mtcars, aes(x=factor(cyl))) + geom_bar(width = 0.5)
+
+# factor(x, level=) : 순서를 변경할 수 있음
+ggplot(mtcars, aes(x=factor(cyl, levels = c('8', '6', '4')))) + 
+  geom_bar(width = 0.5)
+
+# 'fill = 범주값'
+ggplot(mtcars, aes(x=factor(cyl, levels = c('8', '6', '4')), 
+                   fill=as.factor(am))) + 
+  geom_bar(width = 0.5) +
+  labs(fill="am") # 범례의 제목 변경
+
+############################################
+# 범례 표시 위치 선정
+# 범주형 데이터를 사용할 경우 기본으로 범례 표시
+# 범례 위치 변경 : theme(legend.position="위치기호, 값")
+# top/bottom/right(디폴트)/left/none
+
+# iris
+View(iris)
+d1 <- ggplot(iris, aes(Petal.Length, Petal.Width)) +
+  geom_point(aes(color=Species))
+d1
+
+d1 + theme(legend.position = "top")
+d1 + theme(legend.position = "left")
+d1 + theme(legend.position = "right")
+d1 + theme(legend.position = "bottom")
+
+d1 + theme(legend.position = "none")
+
+# x,y 좌표(위치)
+d1 + theme(legend.justification= c(0.2,0.8))
+d1 + theme(legend.justification= c("left", "top"))
+
+
+# legend.direction="horizontal"/"vertical"
+d1 + theme(legend.direction = "horizontal")
+d1 + theme(legend.direction = "vertical",
+           legend.position = "bottom")
+
+# 범례 영역은 사각형임 : 배경과 관련된 내용변경은
+# elemet_rect() 함수 이용해야 함
+# legend.background = 
+
+d1 + theme(legend.background = element_rect(fill='green'))
+d1 + theme(legend.background = element_rect(color='green',
+                                            size=1,
+                                            linetype = 'dashed'))
+
+# 'fill = 범주값'
+ggplot(mtcars, aes(x=factor(cyl, levels = c('8', '6', '4')), 
+                   fill=as.factor(am))) + 
+  geom_bar(width = 0.5) +
+  labs(fill="am") # 범례의 제목 변경
+
+
+#####################
+# scale_fill_manual() 함수 사용 범례 표시
+# values : 색상
+# limits : 실제 시각화 되는 범주
+# name : 범례 제목
+# breaks : 범례에 표현할 변수 값(limits와 같은 결과)
+# labels : 범례 설명값
+
+# mpg 데이터의 class 컬럼의 빈도 막대 그래프
+library(scales)
+library(ggplot2)
+
+g <- ggplot(data=mpg, aes(x=class, fill=class))+geom_bar()
+g
+g + scale_fill_manual(values = c("navy","blue","royalblue",
+                                 "skyblue","orange","gold","yellow"),
+                      name="자동차종류",
+                      breaks = c("compact","suv"),
+                      labels=c("경차","SUV"))
+
+g + scale_fill_manual(values = c("navy","blue","royalblue",
+                                 "skyblue","orange","gold","yellow"),
+                      name="자동차종류",
+                      labels=c("경차","SUV"),
+                      limits = c("compact","suv"))
+
+#################################################################
+# labs() : 그래프안이 제목들에 대해서 설정할 수 있음
+# x=x축제목 / y=y축제목
+# title= 그래프 main 제목
+# subtitle = 세부제목
+# caption = 캡션
+# fill = 범례 제목
+ggplot(mtcars, aes(cyl, fill=as.factor(am))) +
+  geom_bar(position="dodge")
+# x축의 값은 좌표 값에 해당됨
+
+
+
+# x축의 값은 좌표 값이 아닌 표식에 해당
+ggplot(mtcars, aes(cyl, fill=as.factor(am))) +
+  geom_bar(position="dodge") +
+  labs(x='cyl(실린더)',
+       y= 'am coun(빈도)',
+       title="cyl 별 am 빈도 차이 분석",
+       subtitle = '빈도막대그래프 활용',
+       )
+
+
+
+################################################################
+# 각각의 함수 사용
+# ggtitle(), xlab(), ylab(), labs()
+
+ggplot(mtcars, aes(factor(cyl), fill=as.factor(am))) +
+  geom_bar(position="dodge") +
+  ggtitle("cyl별 am 빈도 차이 분석") +
+  xlab('cyl(실린더)') +
+  ylab('am count(빈도)') +
+  labs(fill="AM") +
+  theme(plot.title = element_text (face= "bold",
+                                   size = 20,
+                                   hjust = 0.5,
+                                   color = 'red'),
+        legend.position = "bottom")
 
 
