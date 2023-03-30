@@ -394,79 +394,89 @@ r_ma_pct %>%
   geom_col()
 
 #종교가 없는 사람의 이혼율이 약간 높은걸로 나타남
+#####################################
 # 8. 노년층이 많은 지역
 
 # 지역 : code_region
 class(welfare$code_region)
 # num
 
-# 이상치 - 없음
+# 이상치- 없음
 table(welfare$code_region)
 
 # 결측치 - 없음
 table(is.na(welfare$code_region))
 
-# 지역코드만 존재 - 지역명은 없음
+# 지역 코드만 존재 - 지역명은 없음
 # 각 지역 코드에 대한 지역명을 명시
+"1. 서울          2. 수도권(인천/경기)    3. 부산/경남/울산   
+4.대구/경북   
+5. 대전/충남   6. 강원/충북               7.광주/전남/전북/제주도"
 
-
-# 지역코드 및 지역명에 대한 DF 생성
-# list_region <- data.frame(code_region=c(1:7),
-#                           region = c("서울",
-#                                      "수도권(인천/경기)",
-#                                      "부산/경남/울산",
-#                                      "대구/경북",
-#                                      "대전/충남",
-#                                      "강원/충북",
-#                                      "광주/전남/전북/제주도"))
+# 지역코드 및 지역명에 대한 df 생성
 list_region <- data.frame(code_region=c(1:7),
-                          region = c("Seoul",
-                                     "Inchen/",
-                                     "Busan",
-                                     "Daegu",
-                                     "Daejeon",
-                                     "Gangwon",
-                                     "Guangju/Jeju/JeonNam"))
+                          region = c("서울",
+                                     "수도권(인천/경기)",
+                                     "부산/경남/울산",
+                                     "대구/경북",
+                                     "대전/충남",
+                                     "강원/충북",
+                                     "광주/전남/전북/제주도"))
 list_region
 
 # welfare df의 지역에 코드에 대한 지역명을 결합
-welfare <- left_join(welfare, list_region, by='code_region')
-  
-#################
+welfare <- left_join(welfare,list_region, by='code_region') 
+
+#########################
 # 각 지역의 연령대별 인구수
 welfare %>% 
   group_by(region, ageg) %>% 
   summarise(n=n()) # 그룹이 유지됨
 
-welfare %>%  
+welfare %>% 
   count(region, ageg) # 그룹을 나누지 않았음
 
-# 각 지역별 연령대에 따른 인구수 및 비율 
+# 각 지역별 연령대에 따른 인구수 및 비율
 region_ageg <- welfare %>% 
   count(region, ageg) %>% 
   group_by(region) %>% 
   mutate(pct=round(n/sum(n)*100,2))
 
-# 권역별로 노년층의 비율이 높은 권역 
-ggplot(data=region_ageg, aes(x=region, y=pct, fill=ageg)) +
-  geom_col() + 
+# 권역별로 노년층의 비율이 높은 권역
+ggplot(data=region_ageg, aes(x=region, y=pct, fill=ageg )) +
+  geom_col() +
   coord_flip()
-
-#################################
+#########################
 # 노년층 비율로 내림차순 설정
 list_order <- region_ageg %>% 
-              filter(ageg == 'old') %>% 
-              arrange(-pct)
-
-
+  filter(ageg == 'old') %>% 
+  arrange(pct)
 # 지역명 변수 순서
 order = list_order$region
 
 # 표시되는 변수(x축) 순서 변경
-ggplot(data=region_ageg, aes(x=region, y=pct, fill=ageg)) +
-  geom_col() + 
-  scale_x_discrete(limits=order) + 
+ggplot(data=region_ageg, aes(x=region, y=pct, fill=ageg )) +
+  geom_col() +
+  scale_x_discrete(limits=order) +
   coord_flip()
+
+#####################
+# 막대그래프 내의 값의 순서 변경
+# 노년층 비교가 목적이므로 노년층을 가장 바깥에 표시
+
+# 문자의 사전적인 순서 또는 숫자의 가중치의 순서를 바꾸려면
+# factor() 사용
+class(region_ageg$ageg)
+
+region_ageg$ageg <- factor(region_ageg$ageg,
+                           level=c("old","middle","young"))
+class(region_ageg$ageg)
+
+ggplot(data=region_ageg, aes(x=region, y=pct, fill=ageg )) +
+  geom_col() +
+  scale_x_discrete(limits=order) +
+  coord_flip()
+# 대구 경북이 노년층의 비율이 가장 높다
 
 ##############################
 # 막대그래프 내의 값의 순서 변경
