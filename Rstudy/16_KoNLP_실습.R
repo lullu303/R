@@ -237,4 +237,20 @@ wordcloud2(word_table2,
            backgroundColor = 'black')
 
 
+# 글꼴과 크기, 모양 변경
+wordcloud2(word_table2,
+           fontFamily = "맑은 고딕",
+           size=1.2,
+           color='random-light',
+           backgroundColor = 'black',
+           shape="star")
+??wordcloud2
+
+
+
+
+
+
+
+
 
