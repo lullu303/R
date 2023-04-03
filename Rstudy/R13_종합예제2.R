@@ -269,6 +269,50 @@ View(gu_dust_gg)
 
 # 지도 data : seoul_map
 # 수치 data : gu_dust_gg
+ggChoropleth(data = gu_dust_gg,
+             aes(map_id=code,
+                 fill=finedust,
+                 tooltip=area),
+             map=seoul_map,
+             interactive = T)
+###########################################################
+# 구글맵 위에 미세먼지 농도 point로 표시
+gu_dust_gg # 미세먼지 평균
+
+library(ggmap)
+gu_names <- gu_dust_gg$area
+gu_names
+
+
+# 구명으로 위경도 조회
+gu_geo <- geocode(gu_names)
+gu_geo
+
+
+#############################
+# 데이터 결합
+gu_dust_geo <- cbind(gu_dust_gg, gu_geo)
+View(gu_dust_geo)
+
+# 지도에 표시
+dust_map <- get_googlemap("서울시", zoom=11, maptype = 'roadmap')
+
+ggmap(dust_map) + geom_point(data=gu_dust_geo,
+                             aes(x=lon,
+                                 y=lat,
+                                 size=finedust *3 ,
+                                 color=finedust),
+                             alpha=0.5) +
+  theme(legend.position = "none") +
+  scale_color_gradient(low='blue', high='red')
+
+
+
+
+
+
+
+
 
 
 
