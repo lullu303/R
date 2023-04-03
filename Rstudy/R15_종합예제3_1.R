@@ -107,6 +107,7 @@ apart_data_85_cost <- aggregate(as.integer(거래금액)~단지명,apart_data_85
 apart_data_85 # 85전용면적 전체 데이터
 ls(apart_data_85) #[1] "거래금액" "단지명"   "번지"     "시군구"   "전용면적"
 # 단지명이 중복이 됨
+View(apart_data_85)
 
 apart_data_85_cost # 85전용면적에 대한 단지별 평균 데이터
 ls(apart_data_85_cost) #[1] "거래금액" "단지명" 
@@ -117,3 +118,111 @@ ls(apart_data_85_cost) #[1] "거래금액" "단지명"
 # 단지명은 한번씩, 거래금액은 평균 거래금액만 남게 처리
 
 View(inner_join(apart_data_85, apart_data_85_cost, by='단지명'))
+# 그냥 inner_join() 을 하면 단지가 여러번 중복되므로 
+# apart_data_85 df의 중복된 단지명 행을 제거
+# 작업 시 같이 제거되는 실거래가 데이터는 사용하지 않음(구해놓은 평균 거래가를 사용)
+# 
+duplicated(apart_data_85$단지명)
+# FALSE : 중복되지 않은, 최초로 나온
+# TRUE : 중복된, 현 데이터 이전에 같은 데이터가 있었음
+# 위결과를 이용해서 인덱싱
+
+# 논리 인덱싱(인덱스 값이 TRUE인 요소만 추출)
+test = c(1,2,3,4,5)
+test[c(TRUE,FALSE,FALSE,TRUE,TRUE)]
+
+apart_data_85 <- apart_data_85[!duplicated(apart_data_85$단지명),]
+# 중복이 안된게 false로 나와있어서 true로 바꾸기 위해 
+
+
+# 단지별 평균 거래금액을 갖고 있는 데이터세트와 합치기
+# left_join() 실행
+apart_data_85 <- left_join(apart_data_85, apart_data_85_cost, by="단지명")
+
+# 거래금액 .y 사용
+View(apart_data_85)
+apart_data_85 <- apart_data_85 %>% select(-거래금액.x)
+
+apart_data_85 <- apart_data_85 %>% rename(거래금액=거래금액.y)
+head(apart_data_85)
+
+##################### 거래금액등 아파트 ㄱ본정보 가공 완료
+# 단지 위경도 수집 위해 주소 정보 보정
+# 시군구/번지 열이 구분되어 있음 -> 합쳐서 주소 컬럼을 추가
+
+# 문자열의 결합 : paste()
+apart_address <- paste(apart_data_85$시군구, apart_data_85$번지)
+class(apart_address) # [1] "character" : 벡터형
+
+
+apart_address <- paste(apart_data_85$시군구, apart_data_85$번지) %>%  
+                  data.frame() %>% 
+                  rename("주소"=".")
+
+View(apart_address)
+
+# 위경도 얻어오기
+apart_address_code <- geocode(apart_address$주소)
+###################
+dim(apart_data_85)
+dim(apart_address)
+dim(apart_address_code)
+
+apart_data_final <- cbind(apart_data_85, apart_address, apart_address_code) %>% 
+  select("단지명", "전용면적", "거래금액", "주소", "lon", "lat")
+
+###########################################################
+# 지하철 역 정보와 실거래가 정보를 구글지도에 표시 (시각화)
+
+# 지하철역 정보(2호선)
+# station_code_fin
+
+# 아파트 실거래가 정보(마포구 전용면적 85형 아파트의 평균 실거래가)
+# apart_data_final
+
+# ggmap 시각화
+
+# 특정 위치를 기준으로 지도 데이터 전송받기
+# get_googlemap("기준위치", maptype= "지도형태", zoom=) - 넷연결 필요
+mapo_map <- get_googlemap("mapogu", maptype= 'roadmap', zoom=12)
+
+# 시각화
+#ggmap(지도정보)
+ggmap(mapo_map)
+
+# 지도 위에 객체(점, 선, 텍스트) 표시 - ggplot2
+library(ggplot2)
+
+ggmap(mapo_map) +
+  geom_point(data=station_code_fin, aes(x=lon, y=lat),
+             color='red', size=3) +
+  geom_text(data=station_code_fin, aes(label=역명, vjust=-1))
+# hjust : +값 점의 왼쪽  | -값 점의 오른쪽
+# vjust : +값 점의 아래  | -값 점의 위쪽
+
+
+# 아파트 정보 표시
+# 홍대입구역 부근을 더 세밀하게 표시
+# 지도기준을 홍대입구역으로 
+hongdae_map <- get_googlemap("hongdae station",
+                             maptype= "roadmap",
+                             zoom=15)
+ggmap(hongdae_map) +
+  geom_point(data=station_code_fin, aes(x=lon, y=lat),
+             color='red', size=3) +
+  geom_text(data=station_code_fin, aes(label=역명, vjust=-1)) +
+  geom_point(data=apart_data_final, aes(x=lon, y=lat)) +
+  geom_text(data=apart_data_final, aes(label=단지명, vjust=-1)) +
+  geom_text(data=apart_data_final, aes(label=거래금액, vjust=+1))
+
+
+ggmap(mapo_map) +
+  geom_point(data=station_code_fin, aes(x=lon, y=lat),
+             color='red', size=3) +
+  geom_text(data=station_code_fin, aes(label=역명, vjust=-1)) +
+  geom_point(data=apart_data_final, aes(x=lon, y=lat)) +
+  geom_text(data=apart_data_final, aes(label=단지명, vjust=-1)) +
+  geom_text(data=apart_data_final, aes(label=거래금액, vjust=+1))
+
+
+
