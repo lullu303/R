@@ -1,0 +1,211 @@
+#################################
+# 변수
+################################
+
+# 범주형 변수/수치형 변수
+# 범주형 : 관측치 들이 몇개의 정해진 값만 갖고 있음
+# 수치형 : 연속적인 다양한 값을 갖고 있음
+
+# 변수들간의 관측치의 차이를 확인하고 설명
+# 절대적인 차이 / 상대적인 차이
+# 상대적인 값 : 절대적인 값을 변형해서 생성해낸 수치
+# 수학점수와 수학등수
+# 90점 vs 70점 / 2등 vs 4등
+
+###############################
+# 범주형 변수의 차이 확인 - 요약
+# 한개의 범주형 변수의 요약
+###############################
+
+# 한개의 범주형 변수 생성
+GENDER <- c('남','여','여','남','여','여','여','남','남')
+GENDER <- factor(GENDER)
+# factor() : 범주형변수로 변환할 때 사용
+
+# levels()로 수준(범주) 확인
+levels(GENDER) 
+# [1] "남" "여"
+# GENDER 변수는 남/여 두개의 범주(level)로 정의됨
+
+# 범주형 변수의 요약
+# 절대적인 차이/상대적인 차이로 요약 
+
+# table()로 빈도표 생성 - 절대적인 차이 확인
+t_gender <- table(GENDER)
+t_gender
+# GENDER
+# 남 여 
+# 4  5
+
+# 상대 빈도 계산 - 상대적인 차이 확인
+# 전체 개수 측정
+length(GENDER) # 9
+sum(t_gender) # 9
+
+t_gender/length(GENDER)
+# 남        여 
+# 0.4444444 0.5555556 
+
+# 상대빈도 계산함수 prop.table() 상대 빈도 계산
+# 절대빈도표를 상대빈도표로 변환
+prop.table(t_gender)
+# GENDER
+# 남        여 
+# 0.4444444 0.5555556 
+
+# 범주형 변수의 시각화
+# 막대그래프  /   원그래프
+# 수준의 높이로 표현   /  원을 분할
+# 절대적인 차이/상대적인 차이
+
+#############
+# 시각화로 차이 비교
+#############
+t_gender
+
+barplot(t_gender)
+pie(t_gender)
+
+############################
+# 수치형 변수의 요약
+# 1. 정렬등을 활용한 요약
+# 최대값, 최소값, 중앙값등 관측치들의 위치를 활용한 요약
+# 2. 합계를 활용한 요약
+# 평균, 분산, 표준편차 값의 특성을 활용한 요약
+# 기술통계량 활용
+
+# 통계량 vs 기술통계량
+# 데이터로부터 계산된 모든 숫자 : 통계량
+# 변수자체나 변수들간의 관계등 데이터의 특성을 설명하는 통계량
+
+##############################
+# 한개의 수치형 변수의 요약
+##############################
+
+# 데이터
+score = c(60, 78, 83, 74, 100, 80, 90, 85, 70)
+
+# sort() 관측치 정렬
+sort(score)
+sort(score, decreasing = TRUE)
+
+# 위치통계량
+mean(score) # 평균
+min(score) # 최소값
+max(score) # 최대값
+median(score) # 중앙값
+
+# 최빈값
+mode_y<-table(score)
+names(mode_y)[which(mode_y==max(mode_y))]
+
+which(mode_y==2)
+# 9 반환
+names(mode_y)[9]
+
+# quantile() 함수로 다양한 분위수 계산
+quantile(score,0.25) #74
+quantile(score,0.75) #85
+quantile(score,0.5) #80
+# type= 생략되어 있으면 type=7 로 계산
+# [1]  60  70  74  78  80  83  85  90 100
+??quantile
+
+quantile(score,0.25, type=5)
+quantile(score,0.75, type=5)
+
+# quantile() 함수는 계산하는 알고리즘 type에 
+# 따라 다른 결과가 나옴
+
+# summary() 함수 - 다섯 숫자 요약
+summary(score)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 60      74      80      80      85     100 
+
+# 위치 통계량 시각화 도구
+score
+# boxplot
+boxplot(score)
+
+# hist
+hist(score)
+hist(score, breaks=seq(50,100,5))
+
+# 하나의 수치형 변수의 대략적인 분포를 확인
+
+###################################
+# 여러 수치형 데이터를 비교 (시각화)
+###################################
+
+##################################
+# 2개의 데이터를 히스토 그램으로 비교
+##################################
+
+# 두개의 df 생성
+carrots <- data.frame(length=rnorm(100000, 6, 2))
+cukes <- data.frame(length=rnorm(50000, 7, 2.5))
+
+View(carrots)
+View(cukes)
+
+# 각 df에 분류 추가
+carrots$veg <- 'carrot'
+cukes$veg <- 'cukes'
+
+# 두 df 결합
+vegLengths <- rbind(carrots,cukes)
+View(vegLengths)
+
+# 당근과 호박의 길이 데이터 분포 비교
+# 히스토 그램
+
+library(ggplot2)
+ggplot(vegLengths, aes(length, fill=veg)) +
+  geom_histogram(alpha=0.5, aes(y=..density..), position='identity')
+
+
+###########################
+# box plot을 활용한 집단 비교
+###########################
+
+mtcars$cyl.f <- factor(mtcars$cyl,
+                       levels = c(4,6,8),
+                       labels = c("4","6","8"))
+
+mtcars$am.f <- factor(mtcars$am,
+                       levels = c(0,1),
+                       labels = c("auto","standard"))
+View(mtcars)
+boxplot(mpg ~ am.f * cyl.f,
+        data=mtcars,
+        varwidth=TRUE,
+        col=c("gold","darkgreen"),
+        xlab="AUTO TYPE",
+        ylab="Miles per Gallon")
+
+######################################
+# 변이 통계량(데이터의 흩어진 정도)
+######################################
+score
+# [1]  60  78  83  74 100  80  90  85  70
+# 범위 : 최대값과 최소값의 차이
+# 데이터의 퍼져있는 정도를 나타내는 가장 간단한 방법
+# 극단적인 값에 영향을 받음
+# 2개의 정보만 이용하므로 적절한 척도로 사용하기 어려움
+
+R <- max(score) - min(score)
+R
+
+# 중간범위 : 최대값과 최소값의 평균
+mean(c(max(score), min(score))) # 80
+
+
+
+
+
+
+
+
+
+
+
