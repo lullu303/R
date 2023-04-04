@@ -119,13 +119,59 @@ summary(score)
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 60      74      80      80      85     100 
 
+# 위치 통계량 시각화 도구
+# boxplot
+boxplot(score)
 
+# hist
+hist(score)
+hist(score, breaks=seq(50,100,5))
 
+# 하나의 수치형 변수의 대략적인 분포를 확인
+########################################
+# 여러 수치형 데이터를 비교 (시각화)
 
+#######################################
+# 2개의 데이터를 히스토그램으로 비교
+######################################
 
+# 두개의 df생성
+carrots <- data.frame(length=rnorm(100000, 6,2))
+cukes <- data.frame(length=rnorm(50000, 7, 2.5))
 
+View(carrots)
+View(cukes)
 
+# 각 df에 분류 추가
+carrots$veg <- 'carrot'
+View(carrots)
+cukes$veg <- 'cukes'
+View(cukes)
 
+# 두 df 결합 
+vegLengths <- rbind(carrots, cukes)
+View(vegLengths)
 
+# 당근과 호박의 길이 데이터 분포 비교
+# 히스토그램
+library(ggplot2)
+ggplot(vegLengths, aes(length, fill=veg)) +
+  geom_histogram(alpha=0.5, aes(y=..density..), position = 'identity')
+
+##########################################
+# 변이 통계량 (데이터의 흩어진 정도)
+#########################################
+score
+# [1]  60  78  83  74 100  80  90  85  70
+# 범위 : 최대값과 최소값의 차이
+# 데이터의 퍼져있는 정도를 나타내는 가장 간단한 방법
+# 극단적인 값에 영향을 받음
+# 2개의 정보만 이용하므로 적절한 척도로 사용하기 어려움 
+
+R <- max(score) - min(score)
+R # 40
+
+# 중간범위 : 최대값과 최소값의 평균
+mean(max(score),min(score)) # 100
 
 
