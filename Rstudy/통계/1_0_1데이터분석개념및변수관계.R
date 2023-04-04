@@ -89,3 +89,43 @@ score = c(60, 78, 83, 74, 100, 80, 90, 85, 70)
 # sort() 함수로 관측치 정렬
 sort(score)
 sort(score, decreasing = TRUE)
+
+# 위치통계량
+mean(score) # 평균
+min(score) # 최소값
+max(score)
+median(score)
+
+# 최빈값 
+mode_y <- table(score)
+names(mode_y)[which(mode_y==max(mode_y))]
+
+which(mode_y==2)
+
+# 9 반환
+
+
+
+##########################################################################
+# type= 생략되어있으면 type=7 로 계산
+
+quantile(score,0.25, type=5)
+quantile(score,0.75, type=5)
+
+# quantile() 함수는 계산하는 알고리즘 타입에 따라 다른 결과가 나옴
+
+# summary() 함수 - 다섯숫자 요약
+summary(score)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 60      74      80      80      85     100 
+
+
+
+
+
+
+
+
+
+
+
