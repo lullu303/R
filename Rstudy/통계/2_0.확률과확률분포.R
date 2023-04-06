@@ -272,7 +272,119 @@ cdf_F(6)
 # [1] 1
 
 
+####################################
+# 확률변수의 지표 : 평균 - 기대값
 
+# 확률분포의 평균
+# 이산확률분포의 기대값 : 확률변수 각 값에 대해서 확률을 가중값으로 사용한
+# 가중평균
+# 식 : E(X)=∑(Xi*P(Xi))
+
+# 확률변수
+x_set <- c(1,2,3,4,5,6)
+
+# 불공정한 주사위 확률(가정한 확률)을 구현한 확률함수 f
+# P(Xi)
+f <- function(x){
+  if(x %in% x_set) {
+    res <- x/21
+    return(res)
+  }else {
+    return(0)
+  }
+}
+
+# 기대값 계산
+p_k_com <- c()
+
+for(x in x_set) {
+  p_k_com <- c(p_k_com, x*f(x))
+}
+p_k_com
+
+# 기대값 
+sum(p_k_com) # [1] 4.333333
+
+#####################################
+# 0,  1,  2
+# 0.2 0.5 0.3
+0*0.2 + 1 * 0.5 +2 * 0.3
+# 1주에 평균 1.1 경기를 기대할 수 있다.
+
+################
+# 불공정한 주사위를 백만번 굴려 얻은 표본 평균 
+# 1000000
+dx$p_k
+smp1 <- sample(x_set, 1e+06, replace=T, prob=dx$p_k)
+mean(smpl) # [1] 4.332164
+
+# 확률변수의 분산
+# Var(X)
+# 확률변수로부터 기대값의 차이의 제곱에 대한 기대값 계산
+
+#############################
+# 불공정한 주사위
+# 확률변수
+x_set
+# 확률함수
+f
+# 기대값
+ex <- sum(p_k_com)
+ex
+
+# 분산 계산
+p_var <- c()
+
+for(x in x_set) {
+  p_var <- c(p_var, (x-ex)**2*f(x))
+}
+p_var
+
+# 분산
+sum(p_var) # [1] 2.222222
+
+
+
+
+##########################
+# 샘플을 통해서 얻은 값들의 평균(표본평균)은 확률변수다
+# 표본의 추출은 확률에 의거한다. 그러므로 표본은 확률변수에 해당됨
+# 표본들의 평균, 표본들로 계산되어 나오는 평균도 확률변수
+
+# 표본평균
+# 모집단에서 무작위 추출로 표본크기가 20인 표본을 추출하여 표본평균을 계산
+# 10000번 실행
+
+# 사용데이터
+score
+
+# 20개의 추출된 표본의 평균을 계산해서 저장할 벡터
+sample_means = c()
+
+for (i in 1:10000) {
+  sample_m <- mean(sample(score$score, 20, replace=T))
+  sample_means <- c(sample_means, sample_m)
+}
+
+sample_means
+
+head(sample_means)
+# [1] 71.30 71.45 67.80 68.90 69.95 70.75
+
+smpl_means_df <- data.frame('sample_mean'=sample_means)
+head(smpl_means_df)
+
+library(ggplot2)
+
+ggplot(smpl_means_df, aes(x=sample_mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = mean(score$score), 
+             linetype='dotted', color='red', linewidth=3) +
+  geom_vline(xintercept = mean(smpl_means_df$sample_mean), 
+            color='blue', linewidth=1)
+
+# 표본평균의 히스토그램은 모집단의 산포도이고 모평균을 중심으로 분류가 됨
+# 무작위 추출에 의한 표본평균으로 모평균을 추측할 수 있음
 
 
 
