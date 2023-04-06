@@ -116,7 +116,13 @@ pie(birth_seasons_table)
 
 
 # [7] 각각 표본평균과 중위수 계산
-math_score <- c(77, 78, 76, 81, 86, 51, 79, 82, 84, 99)
+X <- c(77, 78, 76, 81, 86, 51, 79, 82, 84, 99)
+
+qr_f <- function(x){
+  IQR <- quantile(x,0.75)-quantile(x,0.25)
+  names(IQR) <- 'IQR'
+  return(IQR)
+}
 
 summary(math_score)
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -139,10 +145,13 @@ quantile(A_apt)
 # 0%  25%  50%  75% 100% 
 # 1    1    2    3    5 
 
+#[8]
+# 계급의 개수를 5개로 했을 때 계급 구간의 폭 계산
+# 연속형 자료이 도수 분포표의 계급구간 폭 설정은 범위를 
+# 계급의 개수로 나누어서 결정
 
-
-
-
+range<- max(students) - min(students)
+interval <- ceiling(range/5)
 
 
 

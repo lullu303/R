@@ -344,7 +344,7 @@ name <- c('정수병','박성동','박산우','김현수','류성희',
           '강청남','송시현','이아련','최소한','김명화',
           '최두경','김아름','홍길동','홍수채','강감찬')
 
-tbl_blood <- tbl(blood)
+tbl_blood <- table(blood)
 tbl_blood
 
 # 분할표의 합계 계산하기
@@ -421,6 +421,197 @@ prop.table(xt,2)
 
 prop.table(xt) # 전체 빈도의 합(23)에 대한 각 도수의 비율
 xt
+
+###########################
+# 교차표의 시각화 
+# heatmap : 2차원 분할표(교차표)를 숫자대신 색으로 표현한 그래프
+# 색의 진하기로 크기를 표현
+
+tbl_two <- table(TWO_CATE)
+
+heatmap(tbl_two)
+par(pty="m")
+
+heatmap(tbl_two,
+        Rowv = NA, Colv = NA, scale='none',
+        col=colorRampPalette(c('ivory', 'red'))(100))
+
+colorRampPalette(c('ivory', 'red'))(100)
+
+
+# 대량 데이터 이용한 heatmap
+AGE_CITY = as.matrix(read.csv('data/agecity.csv', row.names = 1))
+View(AGE_CITY)
+
+heatmap(AGE_CITY,
+        Rowv = NA, Colv = NA, scale='none',
+        col=colorRampPalette(c('ivory', 'red'))(100))
+
+# 상대빈도표를 이용한 heatmap
+# 
+prop.table(AGE_CITY,1)
+prop.table(AGE_CITY,2)
+
+heatmap(prop.table(AGE_CITY,1),
+        Rowv = NA, Colv = NA, scale='none',
+        col=colorRampPalette(c('ivory', 'red'))(100))
+
+heatmap(prop.table(AGE_CITY,2),
+        Rowv = NA, Colv = NA, scale='none',
+        col=colorRampPalette(c('ivory', 'red'))(100))
+
+####################################################################
+# 두 수치형 변수의 요약
+# 2차원 공간의 시각화 : 산점도
+
+# 두 수치형 변수를 가로축/세로축으로 활용하여 그린 그래프 
+# 두 변수의 평균을 보조선으로 활용 : 2차원 공간의 무게중심 표현 
+
+# 2차원 데이터의 산점도
+two_cont <- read.csv('data/TWO_CONT.csv')
+two_cont
+
+# 공부시간과 시험점수 관측 데이터 
+# HOUR SCORE
+# 1    0    60
+# 2    4    78
+# 3    3    83
+# 4    6    74
+# 5    6   100
+# 6    7    80
+# 7    8    90
+# 8    8    85
+# 9    3    70
+
+# plot()
+plot(two_cont, pch=16, col='blue')
+
+# 보조선 추가
+# abline(v=/h=) 활용
+abline(v=mean(two_cont$HOUR), lty=2)
+abline(h=mean(two_cont$SCORE), lty=2)
+
+#############################
+# 두 수치형 변수의 관계를 계산한 기술 통계량
+# 공분산
+# 0에 가까울수록 두 변수는 관련이 없음
+# 큰 양수가 나올수록 두 변수는 양의 상관을 갖게 됨
+#####
+# 공식 : sum((x-mean(X))) * (y-mean(Y))/(n-1)
+######
+h <- two_cont$HOUR - mean(two_cont$HOUR)
+# [1] -5 -1 -2  1  1  2  3  3 -2
+s <- two_cont$SCORE - mean(two_cont$SCORE)
+# [1] -20  -2   3  -6  20   0  10   5 -10
+
+h*s
+
+sum(h*s) / (nrow(two_cont)-1) # [1] 21.875
+# cov() 공분산 구하는 함수
+cov(two_cont$HOUR, two_cont$SCORE) # [1] 21.875
+
+# 공분산은 두 변수의 관계에 대한 절대적인 요약값임
+# 두변수의 단위 문제가 발생
+
+# 상관계수(피어슨) 도입
+# -1 <= 상관계수 <= 1
+# 공식 : cov(x,y)/sqrt(var(x)*var(y))
+
+# 상관계수
+cov(two_cont$HOUR, two_cont$SCORE)/sqrt(var(two_cont$HOUR) * var(two_cont$SCORE))
+# [1] 0.7011677 => 강한 양의 상관
+
+cor(two_cont$HOUR, two_cont$SCORE) 
+# [1] 0.7011677
+# 공부시간과 점수는 강한 양의 상관관계를 갖는다 
+
+###################################################
+# 한 범주형 변수와 한 수치형 변수
+getwd()
+setwd('통계')
+# 데이터 불러오기
+two_var1 <- read.csv('data/TWo_VAR1.csv')
+two_var1
+
+# aggregate(계산열 ~ 기준열, data=, 통계함수) 조건부 평균 계산
+aggregate(SCORE~CITY, data=two_var1, mean)
+mean(two_var1$SCORE)
+
+
+# 조건부 평균 2
+two_var2 <- read.csv('data/TWo_VAR2.csv')
+two_var2
+
+#  공부방법별 점수의 평균 차이
+aggregate(SCORE~METHOD, data=two_var2, mean)
+# A 공부방법으로 공부한 학생들의 성적은 전체 평균보다 높다
+
+# 그룹별 BOXPLOT을 활용한 시각화
+
+# 도시에 따른 점수 비교
+boxplot(SCORE~CITY, data = two_var1)
+
+# 공부방법에 따른 점수 비교
+boxplot(SCORE ~ METHOD, data=two_var2)
+
+
+# 그룹별 상자그림 예 2
+#######################################
+# 1000명의 고객의 거주지와 방문 횟수 데이터
+######################################
+
+city_count <- read.csv('data/city_count.csv')
+View(city_count)
+nrow(city_count)
+ls(city_count) # [1] "CITY"  "COUNT"
+
+# 거주지별 고객수
+aggregate(COUNT ~ CITY, data=city_count, length)
+
+# 거주지별 고객들의 총 방문횟수
+aggregate(COUNT ~ CITY, data=city_count, sum)
+
+# 거주지별 고객들의 평균방문횟수
+aggregate(COUNT ~ CITY, data=city_count, mean)
+
+boxplot(COUNT~CITY, data=city_count)
+
+##########################################################
+# 수치형 변수의 구간화를 활용한 조건부 요약
+#########################################################
+
+two_var2
+
+# cut(data=, breaks=구간 수/구간기준) 함수로 수치형 변수를 구간화하기
+# 구간 경계값 지정 : 0 ~ 75, 76~85, 86~100
+breaks = c(0,75,85,100)
+
+# 구간화
+score_grp <- cut(two_var2$SCORE, breaks = breaks)
+
+score_grp
+
+two_var2$SCORE_GRp <- score_grp
+two_var2
+
+# 교차표 생성
+table(two_var2$METHOD, two_var2$SCORE_GRp)
+table(two_var2$SCORE_GRp, two_var2$METHOD)
+
+# 시각화
+heatmap(table(two_var2$SCORE_GRp, two_var2$METHOD),
+        Rowv = NA, Colv = NA, scale='none', 
+        col=colorRampPalette(c('blue','red'))(100))
+
+
+
+
+
+
+
+
+
+
 
 
 
