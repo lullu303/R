@@ -284,7 +284,34 @@ pvar_test(sample,9)
 # 모분산을 알지 못하는 상황에서 정규분포의 모평균에 대한 검정을 1표본 t검정ㅇ이라고 함
 # t 통계량 : (표본평균 - 모평균) / sqrt(표본분산/n)
 
+sample = potato_smpl
+mean0 = 130
 
+pmean_test2 <-function(sample, mean0, alpha=0.05) {
+  s_mean <- mean(sample)
+  s_var = var(sample)
+  n <- length(sample)
+  
+  # 양측 기각역
+  interval <- qt(alpha/2, df=n-1)
+  interval <- c(interval, qt(1-(alpha/2), df=n-1))
+  
+  # 검정통계량
+  t = (s_mean - mean0) /sqrt(s_var/n)
+  
+  if (interval[1] <= t & t <= interaction[2])
+    print('귀무가설을 채태')
+  else
+    print('귀무가설을 기각')
+  
+  if (t <- 0)
+    p = pt(t, df=n-1) *2
+  else
+    p = (1-pt(t,df=n-1)) *2
+  cat('t값은', t, 'p값은 ', p)
+}
+
+pmean_test2(sample, 130)
 
 
 
