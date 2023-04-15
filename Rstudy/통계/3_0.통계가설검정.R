@@ -299,20 +299,22 @@ pmean_test2 <-function(sample, mean0, alpha=0.05) {
   # 검정통계량
   t = (s_mean - mean0) /sqrt(s_var/n)
   
-  if (interval[1] <= t & t <= interaction[2])
-    print('귀무가설을 채태')
+  if (interval[1] <= t & t <= interval[2])
+    print('귀무가설을 채택')
   else
     print('귀무가설을 기각')
   
-  if (t <- 0)
+  if (t < 0)
     p = pt(t, df=n-1) *2
   else
     p = (1-pt(t,df=n-1)) *2
+  
   cat('t값은', t, 'p값은 ', p)
 }
 
 pmean_test2(sample, 130)
-
+# [1] "귀무가설을 채택"
+# t값은 -1.455196 p값은  0.1693346
 
 
 
