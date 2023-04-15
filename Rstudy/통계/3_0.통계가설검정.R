@@ -316,6 +316,19 @@ pmean_test2(sample, 130)
 # [1] "귀무가설을 채택"
 # t값은 -1.455196 p값은  0.1693346
 
+# 가설검정을 위한 함수들이 구현되어 있음
+# t.test(변수)
+# t.test(변수1, 변수2)
+
+# 두 집단의 평균이 같은지 아닌지를 확인하는 검정
+sample
+pop_sampl <- rep(130, length(sample))
+mean(pop_sampl)
+
+t.test(sample, pop_sampl)
+# p-value = 0.1693
+
+
 
 
 
