@@ -337,13 +337,3 @@ t.test(sample, pop_sampl)
 
 
 
-
-
-
-
-
-
-
-
-
-
