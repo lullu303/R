@@ -76,26 +76,77 @@ summary(raw_aov)
 # p_value Pr(>f) 값이 0에 수렴하므로 귀무가설 기각
 # 세집단의 평균은 유의한 차이가 있다.
 
+##############################
+# 사후분석 :
+# 세집단의 평균이 유의한 차이가 있다는 것을 확인했다면
+# 어느 집단간 차이인것인지를 확인
+
+# 1. model.tables(type= mean/effect)
+model.tables(raw_aov, type='mean')
+# Grand mean : 전체 평균 
+# 
+# 158.1444 
+# 
+# variable 
+# variable
+# 지점A  지점B  지점C 
+# 137.87 136.47 200.10 
+
+model.tables(raw_aov, type='effect')
+# Tables of effects
+# 
+# variable 
+# variable
+# 지점A  지점B  지점C 
+# -20.28 -21.68  41.96
 
 
+# 2. TukeyHSD(aov분석객체)
+compare <- TukeyHSD(raw_aov)
+compare
 
+plot(compare, col="darkblue", las=1)
 
+################
+# 아노바 검정 Ex 2
+raw_anova <- read.csv('data/htest04.csv', header = T)
+head(raw_anova) # long형 데이터
+tail(raw_anova)
 
+unique(raw_anova$group)
+# [1] "A" "B" "C"
 
+A <- raw_anova[raw_anova$group =='A',]
+B <- raw_anova[raw_anova$group =='B',]
+C <- raw_anova[raw_anova$group =='C',]
+mean(A[,2])
+mean(B[,2])
+mean(C[,2])
 
+boxplot(A[,2], B[,2], C[,2])
 
+# 정규성검정 : 정규성을 가정할 수 있다
+shapiro.test(A[,2])
+shapiro.test(B[,2])
+shapiro.test(C[,2])
 
+# 등분산성 검정
+leveneTest(raw_anova$height, raw_anova$group)
+leveneTest(raw_anova$height, as.factor(raw_anova$group))
+leveneTest(height~as.factor(group), data=raw_anova)
 
+#############
+# Anova
+raw_A <- aov(height~group, data=raw_anova)
+summary(raw_A)
+# 1.14e-05 : 귀무가설을 기각한다
 
+#############
+# 사후분석
+compare <- TukeyHSD(raw_A)
+compare
 
-
-
-
-
-
-
-
-
+plot(compare, col='darkblue', las=1)
 
 
 
