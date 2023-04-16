@@ -40,6 +40,38 @@ t.test(before,after,paried=TRUE, alternative = 'less')
 # 프로모션의 효과로 평균이 증가했다.
 
 
+#############################
+# 대응표본 T검정 Ex2
+# 다이어트 약의 효과 검증
+
+setwd('통계')
+df <- read.csv("data/다이어트약_효과검증.csv")
+head(df)
+
+
+before <- df$다이어트전.kg.
+after <- df$다이어트후.kg.
+
+# 평균 계산
+mean(before) ; mean(after)
+# 줄어든 평균이 의미가 있는 것인지 확인(검정)
+
+############
+# 정규성 가정 - 두 변수의 차이값에 대해 정규성검정
+
+diff <- before-after
+
+shapiro.test(diff) # 정규성 가정
+
+# 대응표본 T검정(paired=T)
+t.test(before, after, paired = TRUE, alternative = 'greater')
+# 귀무가서 : before와 after의 몸무게 평균은 같다
+# 대립가설 : before의 몸무게 평균이 after의 몸무게 평균보다 크다
+# alternative = 'twosides' : before와 after의 몸무게 평균은 다르다.
+# alternative = 'less' : before의 평균이 after보다 작다
+
+
+
 
 
 
