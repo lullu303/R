@@ -70,6 +70,9 @@ t.test(before, after, paired = TRUE, alternative = 'greater')
 # alternative = 'twosides' : before와 after의 몸무게 평균은 다르다.
 # alternative = 'less' : before의 평균이 after보다 작다
 
+# p-value = 2.685e-13 : 귀무가설 기각, 대립가설 채택
+# 다이어트약이 효과가 있다.
+
 
 
 
